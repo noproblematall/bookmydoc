@@ -7,7 +7,8 @@ class Doctor extends CI_Controller {
 		$this->load->helper('url','form');	
 		$this->load->model('Doctor_Model');	
 		$this->load->model('Home_Model');
- 	}	
+	 }	
+	 
 	/*public function index(){		
 		$data = array();		
 		if(isset($_POST) and !empty($_POST)){
