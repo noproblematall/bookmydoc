@@ -463,11 +463,12 @@ class Doctor extends CI_Controller {
 		);  
 		$result=$this->Doctor_Model->cancel_appoinment($id, $data1);
 		if($result == "cancel"){ 
-		$result = array('status'  => 'cancel','message'  => 'cancel');
-	}
-	else{
-		$result = array('status'  => 'error','message'  => 'error');
-	}
+            $result = array('status'  => 'cancel','message'  => 'cancel');
+            $this->doctor_email($id,"cancel");
+        }
+        else{
+            $result = array('status'  => 'error','message'  => 'error');
+        }
 		print json_encode($result);
 	}
 	
@@ -479,15 +480,47 @@ class Doctor extends CI_Controller {
 		);   
 		$result=$this->Doctor_Model->approve_appoinment($id, $data1);
 		if($result == "approved"){ 
-		$result = array('status'  => 'approved','message'  => 'approved');
-	}
-	else{
-		$result = array('status'  => 'error','message'  => 'error');
-	}
+            $result = array('status'  => 'approved','message'  => 'approved');
+            $this->doctor_email($id,"approved");
+        }
+        else{
+            $result = array('status'  => 'error','message'  => 'error');
+        }
 		print json_encode($result);
-	}
-	
-	
-	
-  }
+    }
+
+    public function doctor_email($id,$status){
+        if($status = "approved"){
+            $subject = "Your Appointment is approved.";
+            $message = "Your Appointment is approved.";
+        }else{
+            $subject = "Your Appointment is canceled.";
+            $message = "Your Appointment is canceled.";
+        }
+
+        $appointment = $this->db->get_where('appointment', array('id' => $id))->row();
+        $patient = $this->db->get_where('patient', array('id' => $appointment->patient_id))->row();
+        $doctor = $this->db->get_where('doctor', array('id' => $appointment->doctor_id))->row();
+
+        $settings = get_icon();
+        $this->load->library('phpmailer_lib');
+        $mail = $this->phpmailer_lib->load();
+        $mail->isSMTP();
+        $mail->Host = $settings->smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $settings->smtp_username;
+        $mail->Password = $settings->smtp_password;
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+        $mail->setFrom($from_email, $doctorname);
+        // Add a recipient
+        $mail->addAddress($patient->email);
+        $mail->Subject = $subject;
+        $mail->isHTML(true);
+        $mailContent = $message;
+        $mail->Body = $mailContent;
+        $mail->send();
+    }
+    	
+}
 ?>
