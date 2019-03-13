@@ -1,0 +1,24 @@
+<?php $lang['patient_lang'] = "patient_lang";
+$lang['page_name'] = "doctorfilter_lang";
+$lang['language'] = "english";
+$lang['doctorfilter_slide_A1'] = "City";
+$lang['doctorfilter_slide_A2'] = "select City";
+$lang['doctorfilter_slide_A3'] = "Specialty";
+$lang['doctorfilter_slide_A4'] = "Select specialty";
+$lang['doctorfilter_slide_A5'] = "Reason";
+$lang['doctorfilter_slide_A6'] = "Select reason";
+$lang['doctorfilter_slide_A7'] = "Insurance";
+$lang['doctorfilter_slide_A8'] = "Select Insurance";
+$lang['doctorfilter_slide_A9'] = "Language";
+$lang['doctorfilter_slide_A10'] = "Select Language";
+$lang['doctorfilter_slide_A11'] = "Gender";
+$lang['doctorfilter_slide_A12'] = "Doctors near by You";
+$lang['doctorfilter_slide_A13'] = "Select a Speciality Doctor";
+$lang['doctorfilter_slide_A14'] = "View Profile";
+$lang['doctorfilter_slide_A15'] = "Book Online";
+$lang['doctorfilter_slide_A16'] = "close";
+$lang['doctorfilter_slide_A17'] = "Sorry, No records found. Please try with different keywords.";
+$lang['doctorfilter_slide_A18'] = "Appointment Details";
+$lang['doctorfilter_slide_A19'] = "Male";
+$lang['doctorfilter_slide_A20'] = "Female";
+ ?>
