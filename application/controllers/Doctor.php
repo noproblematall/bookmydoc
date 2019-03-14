@@ -433,7 +433,56 @@ class Doctor extends CI_Controller {
 		}	
 	}
 	public function appointment_email(){
-		
+		if(isset($_POST)){
+			$data=$_POST;
+			$settings = get_icon();
+			$status = $data['status'];
+			$end_time = $data['end_time'];
+			$insurance = $data['insurance'];
+			$insurance_name = $this->Doctor_Model->get_insurance_name($insurance);
+			$ill_reason = $data['ill_reason'];
+			$ill_reason_name = $this->Doctor_Model->get_ill_reason($ill_reason);
+			$datearray=explode ('-',$data['appointment_date']);
+			$appointment_date = trim($datearray[1].'-'.$datearray[2].'-'.$datearray[3]);
+			$timearray=explode ('-',$data['appointment_time']);
+			$appointment_time = trim($timearray[0].' '.$timearray[1]);
+			$doctor_id = $data['doctor_id'];
+			$doctor = $this->Doctor_Model->get_doctor_data($doctor_id);
+			$doctor_email = $doctor->email;
+			$doctor_name = $doctor->doctor_lastname;
+			$patient_name=$this->session->userdata['frontend_logged_in']['username'];	
+			$patient_email=$this->session->userdata['frontend_logged_in']['email'];	
+			// $result = $this->Doctor_Model->book_appointment($datafinal);
+			$this->load->library('phpmailer_lib');
+			$mail = $this->phpmailer_lib->load();
+			$mail->isSMTP();
+			$mail->Host = $settings->smtp_host;
+			$mail->SMTPAuth = true;
+			$mail->Username = $settings->smtp_username;
+			$mail->Password = $settings->smtp_password;
+			$mail->SMTPSecure = 'ssl';
+			$mail->Port = 465;
+			$mail->setFrom($patient_email, $patient_name);
+			// Add a recipient
+			$mail->addAddress($doctor_email);
+			$mail->Subject = 'New Appointment';
+			$mail->isHTML(true);
+			$mailContent = "<h1>Mr</h1> ".$doctor_name."<br>";
+			$mailContent .= "<h1>Status</h1> ".$status."<br>";
+			$mailContent .= "<h1>End time</h1> ".$end_time."<br>";
+			$mailContent .= "<h1>Insurance</h1> ".$insurance_name."<br>";
+			$mailContent .= "<h1>Ill reason</h1> ".$ill_reason_name."<br>";
+			$mailContent .= "<h1>Appointment date</h1> ".$appointment_date."<br>";
+			$mailContent .= "<h1>Appointment time</h1> ".$appointment_time."<br>";
+			$mailContent .= "<h1>Patient name</h1> ".$patient_name." ".$patient_email;
+			$mail->Body = $mailContent;
+			// Send email
+			if($mail->send()){
+				echo "sent";
+			}else{
+				echo 'no';
+			}
+		}	
 	}
 	public function booking_calendar(){
 		$id = $_POST['id'];

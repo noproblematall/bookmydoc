@@ -385,7 +385,7 @@
 					appointment_date: $("#cal_date").val(),
 					appointment_time: $("#cal_time").val(),
 					doctor_id: $("#doctor_id").val()
-				}		
+				};				
 			$.ajax({
 				type: "POST",
 				url: base_url+"Doctor/appointment",			 
@@ -405,8 +405,10 @@
 							data: appointemnt_data,
 							success:function(data){
 								console.log(data);
-								if(data == ''){
-									
+								if(data == 'sent'){
+									console.log('ok');
+								}else{
+									console.log('no');
 								}
 							}
 						});			 
@@ -418,8 +420,8 @@
 					    $('.errormsgpat').html(error);									   
 					}				                          									
 				}						
-			});		  	
-		 });
+			});
+		});
 		$("#formpatreg").submit(function(event){
 			event.preventDefault();	 
 			$.ajax({

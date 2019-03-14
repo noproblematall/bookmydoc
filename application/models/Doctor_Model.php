@@ -1200,6 +1200,32 @@ public function getData($loadType,$loadId){
 		$view_galpic = $query->result();		
         return $view_galpic;  
 	}
+
+	// ======== Doctor Email =================
+	function get_doctor_data($id){
+		$this->db->select("*");
+		$this->db->from('doctor');
+		$this->db->where('id',$id);
+		$query = $this->db->get();
+		$result = $query->row();
+		return $result;
+	}
+	function get_ill_reason($id){
+		$this->db->select("*");
+		$this->db->from("visit_categories");
+		$this->db->where('id',$id);
+		$query = $this->db->get();
+		$result = $query->row();
+		return $result->reason;
+	}
+	function get_insurance_name($id){
+		$this->db->select("*");
+		$this->db->from("insurance_categories");
+		$this->db->where('id',$id);
+		$query = $this->db->get();
+		$result = $query->row();
+		return $result->insurance_name;
+	}
 	/* == Doctor [ GET Method ] == */
 	function get_singledoctor($id){			
 		$this->db->select('do.id as id,do.doctor_firstname,do.doctor_experience,do.doctor_lastname,do.doctor_sex,do.email,do.doctor_age,do.doctor_degree,do.doctor_affiliations,do.doctor_languages,do.doctor_awards,do.about_doctor,do.doctor_memberships,do.doctor_office_country,do.password,do.doctor_office_address,do.doctor_office_state,do.doctor_office_city,cities.zip as doctor_office_zip,do.specialty,do.terms,do.status,do.display_image,
