@@ -1452,8 +1452,8 @@ public function getData($loadType,$loadId){
 		$this->db->join('insurance_categories','FIND_IN_SET(insurance_categories.id, patient.insurance) > 0', 'left');
 		$this->db->join('visit_categories','FIND_IN_SET(visit_categories.id, patient.visitation) > 0', 'left');
 		$this->db->where('patient.id', $id);
-		$query = $this -> db -> get();		
-		$result= $query->row();		
+		$query = $this->db->get();		
+		$result= $query->row();
 		return $result;	
 	}
 	function update_bklevelone($id,$data){

@@ -7,7 +7,8 @@ class Doctor extends CI_Controller {
 		$this->load->helper('url','form');	
 		$this->load->model('Doctor_Model');	
 		$this->load->model('Home_Model');
- 	}	
+	 }	
+	 
 	/*public function index(){		
 		$data = array();		
 		if(isset($_POST) and !empty($_POST)){
@@ -511,11 +512,12 @@ class Doctor extends CI_Controller {
 		);  
 		$result=$this->Doctor_Model->cancel_appoinment($id, $data1);
 		if($result == "cancel"){ 
-		$result = array('status'  => 'cancel','message'  => 'cancel');
-	}
-	else{
-		$result = array('status'  => 'error','message'  => 'error');
-	}
+            $result = array('status'  => 'cancel','message'  => 'cancel');
+            $this->doctor_email($id,"cancel");
+        }
+        else{
+            $result = array('status'  => 'error','message'  => 'error');
+        }
 		print json_encode($result);
 	}
 	
@@ -527,15 +529,88 @@ class Doctor extends CI_Controller {
 		);   
 		$result=$this->Doctor_Model->approve_appoinment($id, $data1);
 		if($result == "approved"){ 
-		$result = array('status'  => 'approved','message'  => 'approved');
-	}
-	else{
-		$result = array('status'  => 'error','message'  => 'error');
-	}
+            $result = array('status'  => 'approved','message'  => 'approved');
+            $this->doctor_email($id,"approved");
+        }
+        else{
+            $result = array('status'  => 'error','message'  => 'error');
+        }
 		print json_encode($result);
-	}
-	
-	
-	
-  }
+    }
+
+    public function doctor_email($id,$status){
+
+        $appointment = $this->db->get_where('appointment', array('id' => $id))->row();
+        $patient = $this->db->get_where('patient', array('id' => $appointment->patient_id))->row();
+        $doctor = $this->db->get_where('doctor', array('id' => $appointment->doctor_id))->row();
+
+        $cdt = date("Y-m-d H:i:s");
+        $cdate = date("Y-m-d");
+        $ctime = date("H-i-s");
+
+        if($status == "approved"){
+            $template = $this->db->get_where('email_template', array('identifire' => 'administrator_appointment_mail_from_doctor'))->row();
+            $subject = $template->subject;
+            $message = $template->body;
+            
+            $subject = str_replace("SITENAME", "BOOK MY DOC", $subject);
+            $message = str_replace("__NAME__", $patient->patient_firstname, $message);
+            $message = str_replace("__DOCTOR__", $doctor->doctor_firstname, $message);
+            $message = str_replace("__DATE__ __TIME__", $cdt, $message);
+            $message = str_replace("__DATE__", $appointment->appointment_date, $message);
+            $message = str_replace("__TIME__", $appointment->appointment_time, $message);
+            $message = str_replace("__EMAIL__", $patient->email, $message);
+            $message = str_replace("__PTPHONE__", $patient->phone, $message);
+            $message = str_replace("__DAY__", "", $message);
+            $message = str_replace("__OFFICE__", $doctor->doctor_office_address, $message);
+            $message = str_replace("__ADDRESS1__", "", $message);
+            $message = str_replace("__ADDRESS2__", "", $message);
+            $message = str_replace("__PHONE__", $doctor->phone, $message);
+            $message = str_replace("SITENAME", "BOOK MY DOC", $message);
+            $message = str_replace("__SITE_URL__", "http://doctorama.mx", $message);
+        }else{
+            $template = $this->db->get_where('email_template', array('identifire' => 'administrator_appointment_cancel_mail_from_doctor'))->row();
+            $subject = $template->subject;
+            $message = $template->body;
+            
+            $subject = str_replace("SITENAME", "BOOK MY DOC", $subject);
+            $message = str_replace("__RECEIVER__", $patient->patient_firstname, $message);
+            $message = str_replace("__NAME__", $patient->patient_firstname, $message);
+            $message = str_replace("__DOCTOR__", $doctor->doctor_firstname, $message);
+            $message = str_replace("__DATE__ __TIME__", $cdt, $message);
+            $message = str_replace("__DATE__", $appointment->appointment_date, $message);
+            $message = str_replace("__TIME__", $appointment->appointment_time, $message);
+            $message = str_replace("__EMAIL__", $patient->email, $message);
+            $message = str_replace("__PTPHONE__", $patient->phone, $message);
+            $message = str_replace("__DAY__", "", $message);
+            $message = str_replace("__OFFICE__", $doctor->doctor_office_address, $message);
+            $message = str_replace("__ADDRESS1__", "", $message);
+            $message = str_replace("__ADDRESS2__", "", $message);
+            $message = str_replace("__PHONE__", $doctor->phone, $message);
+            $message = str_replace("SITENAME", "BOOK MY DOC", $message);
+            $message = str_replace("__SITE_URL__", "http://doctorama.mx", $message);
+        }        
+
+        $settings = get_icon();
+        $from_email=$settings->admin_email;
+        $this->load->library('phpmailer_lib');
+        $mail = $this->phpmailer_lib->load();
+        $mail->isSMTP();
+        $mail->Host = $settings->smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $settings->smtp_username;
+        $mail->Password = $settings->smtp_password;
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+        $mail->setFrom($from_email, $doctor->doctor_firstname);
+        // Add a recipient
+        $mail->addAddress($patient->email);
+        $mail->Subject = $subject;
+        $mail->isHTML(true);
+        $mailContent = $message;
+        $mail->Body = $mailContent;
+        $result = $mail->send();
+    }
+    	
+}
 ?>
