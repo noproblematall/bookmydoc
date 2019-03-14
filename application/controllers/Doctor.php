@@ -450,10 +450,13 @@ class Doctor extends CI_Controller {
 			$doctor_id = $data['doctor_id'];
 			$doctor = $this->Doctor_Model->get_doctor_data($doctor_id);
 			$doctor_email = $doctor->email;
-			$doctor_name = $doctor->doctor_lastname;
+			$doctor_lastname = $doctor->doctor_lastname;
+			$doctor_firstname = $doctor->doctor_firstname;
+			$doctor_name = $doctor_firstname." ".$doctor_lastname;
 			$patient_name=$this->session->userdata['frontend_logged_in']['username'];	
 			$patient_email=$this->session->userdata['frontend_logged_in']['email'];	
-			// $result = $this->Doctor_Model->book_appointment($datafinal);
+			$patient_id=$this->session->userdata['frontend_logged_in']['id'];
+			$patient=$this->db->get_where('patient', array('id' => $patient_id))->row();
 			$this->load->library('phpmailer_lib');
 			$mail = $this->phpmailer_lib->load();
 			$mail->isSMTP();
@@ -465,18 +468,29 @@ class Doctor extends CI_Controller {
 			$mail->Port = 465;
 			$mail->setFrom($patient_email, $patient_name);
 			// Add a recipient
-			$mail->addAddress($doctor_email);
-			$mail->Subject = 'New Appointment';
+			$mail->addAddress($doctor_email);			
 			$mail->isHTML(true);
-			$mailContent = "<h1>Mr</h1> ".$doctor_name."<br>";
-			$mailContent .= "<h1>Status</h1> ".$status."<br>";
-			$mailContent .= "<h1>End time</h1> ".$end_time."<br>";
-			$mailContent .= "<h1>Insurance</h1> ".$insurance_name."<br>";
-			$mailContent .= "<h1>Ill reason</h1> ".$ill_reason_name."<br>";
-			$mailContent .= "<h1>Appointment date</h1> ".$appointment_date."<br>";
-			$mailContent .= "<h1>Appointment time</h1> ".$appointment_time."<br>";
-			$mailContent .= "<h1>Patient name</h1> ".$patient_name." ".$patient_email;
-			$mail->Body = $mailContent;
+			$template = $this->db->get_where('email_template', array('identifire' => 'doctor_appointment_email'))->row();
+			$subject = $template->subject;
+			$message = $template->body;
+			$subject = str_replace("SITENAME", "BOOK MY DOC", $subject);
+			$mail->Subject = $subject;
+			$message = str_replace("SITENAME", "BOOK MY DOC", $message);
+			$message = str_replace("__DOCTOR__", $doctor_name, $message);
+			$message = str_replace("__DATE__", $appointment_date, $message);
+			$message = str_replace("__TIME__", $appointment_time, $message);
+			$message = str_replace("__NAME__", $patient_name, $message);
+			$message = str_replace("__EMAIL__", $patient_email, $message);
+			$message = str_replace("__PHONE__", $patient->phone, $message);
+			$message = str_replace("__ZIP__", $patient->zip, $message);
+			$message = str_replace("__AGE__", $patient->age, $message);
+			$message = str_replace("__GENDER__", $patient->gender, $message);
+			$message = str_replace("__STATUS__", $patient->status, $message);
+			$message = str_replace("__REASONFORVISIT__", $ill_reason_name, $message);
+			$message = str_replace("__INSURANCE__CAREER__", "", $message);
+			$message = str_replace("__INSURANCE__PLAN__", $insurance_name, $message);	
+			
+			$mail->Body = $message;
 			// Send email
 			if($mail->send()){
 				echo "sent";
