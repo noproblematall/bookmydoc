@@ -258,21 +258,28 @@ class Login_Model extends CI_Model{
 					$this->db->where('email',$email);
 					$query=$this->db->update('hospital',$password);
 					if($query){
-						$configs = array(
-							'protocol'=>'smtp',
-							'smtp_host'=>$settings->smtp_host,
-							'smtp_user'=>$settings->smtp_username,
-							'smtp_pass'=>$settings->smtp_password,
-							'smtp_port'=>'587'
-							);             
-						$this->load->library('email');
-						$this->email->initialize($configs);
-						$this->email->from($from_email, $username);
-						$this->email->to($email);
-						$this->email->subject('Forget Password');
-						$this->email->message('New Password is '.$rand_pwd.' ');
-						$this->email->send();        
-						return "EmailSend";
+						$this->load->library('phpmailer_lib');
+						$mail = $this->phpmailer_lib->load();
+						$mail->isSMTP();
+						$mail->Host = $settings->smtp_host;
+						$mail->SMTPAuth = true;
+						$mail->Username = $settings->smtp_username;
+						$mail->Password = $settings->smtp_password;
+						$mail->SMTPSecure = 'ssl';
+						$mail->Port = 465;
+						$mail->setFrom($from_email, $username);				
+						// Add a recipient
+						$mail->addAddress($email);
+						$mail->Subject = 'Forget Password';
+						$mail->isHTML(true);
+						$mailContent = "<h1>New Password is</h1> ".$rand_pwd;
+						$mail->Body = $mailContent;
+						// Send email
+						if($mail->send()){
+							return "EmailSend";
+						}else{
+							return 'EmailNotExist';
+						}
 					}
 				}else{
 					$this->db->where('email',$email);
@@ -288,21 +295,28 @@ class Login_Model extends CI_Model{
 						$this->db->where('email',$email);
 						$query=$this->db->update('medical_center',$password);
 						if($query){
-							$configs = array(
-								'protocol'=>'smtp',
-								'smtp_host'=>$settings->smtp_host,
-								'smtp_user'=>$settings->smtp_username,
-								'smtp_pass'=>$settings->smtp_password,
-								'smtp_port'=>'587'
-								);             
-							$this->load->library('email');
-							$this->email->initialize($configs);
-							$this->email->from($from_email, $username);
-							$this->email->to($email);
-							$this->email->subject('Forget Password');
-							$this->email->message('New Password is '.$rand_pwd.' ');
-							$this->email->send();        
-							return "EmailSend";
+							$this->load->library('phpmailer_lib');
+							$mail = $this->phpmailer_lib->load();
+							$mail->isSMTP();
+							$mail->Host = $settings->smtp_host;
+							$mail->SMTPAuth = true;
+							$mail->Username = $settings->smtp_username;
+							$mail->Password = $settings->smtp_password;
+							$mail->SMTPSecure = 'ssl';
+							$mail->Port = 465;
+							$mail->setFrom($from_email, $username);				
+							// Add a recipient
+							$mail->addAddress($email);
+							$mail->Subject = 'Forget Password';
+							$mail->isHTML(true);
+							$mailContent = "<h1>New Password is</h1> ".$rand_pwd;
+							$mail->Body = $mailContent;
+							// Send email
+							if($mail->send()){
+								return "EmailSend";
+							}else{
+								return 'EmailNotExist';
+							}
 						}
 					}else{
 						$this->db->where('email',$email);
@@ -318,21 +332,43 @@ class Login_Model extends CI_Model{
 							$this->db->where('email',$email);
 							$query=$this->db->update('clinic',$password);
 							if($query){				               
-								$configs = array(
-									'protocol'=>'smtp',
-									'smtp_host'=>$settings->smtp_host,
-									'smtp_user'=>$settings->smtp_username,
-									'smtp_pass'=>$settings->smtp_password,
-									'smtp_port'=>'587'
-									);             
-								$this->load->library('email');
-								$this->email->initialize($configs);
-								$this->email->from($from_email, $username);
-								$this->email->to($email);
-								$this->email->subject('Forget Password');
-								$this->email->message('New Password is '.$rand_pwd.' ');
-								$this->email->send();        
-								return "EmailSend";
+								// $configs = array(
+								// 	'protocol'=>'smtp',
+								// 	'smtp_host'=>$settings->smtp_host,
+								// 	'smtp_user'=>$settings->smtp_username,
+								// 	'smtp_pass'=>$settings->smtp_password,
+								// 	'smtp_port'=>'587'
+								// 	);             
+								// $this->load->library('email');
+								// $this->email->initialize($configs);
+								// $this->email->from($from_email, $username);
+								// $this->email->to($email);
+								// $this->email->subject('Forget Password');
+								// $this->email->message('New Password is '.$rand_pwd.' ');
+								// $this->email->send();        
+								// return "EmailSend";
+								$this->load->library('phpmailer_lib');
+								$mail = $this->phpmailer_lib->load();
+								$mail->isSMTP();
+								$mail->Host = $settings->smtp_host;
+								$mail->SMTPAuth = true;
+								$mail->Username = $settings->smtp_username;
+								$mail->Password = $settings->smtp_password;
+								$mail->SMTPSecure = 'ssl';
+								$mail->Port = 465;
+								$mail->setFrom($from_email, $username);				
+								// Add a recipient
+								$mail->addAddress($email);
+								$mail->Subject = 'Forget Password';
+								$mail->isHTML(true);
+								$mailContent = "<h1>New Password is</h1> ".$rand_pwd;
+								$mail->Body = $mailContent;
+								// Send email
+								if($mail->send()){
+									return "EmailSend";
+								}else{
+									return 'EmailNotExist';
+								}
 							}
 						}else{
 							return "EmailNotExist";
