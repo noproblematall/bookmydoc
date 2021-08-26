@@ -113,6 +113,7 @@ class Hospital extends CI_Controller {
 			$this->load->view('loadmore_hospitaldoctor',$template);	
 		}		
 	} */
+	
 	/* Hospital Search Pool Method */
 	public function Search(){
 		if($_POST){
